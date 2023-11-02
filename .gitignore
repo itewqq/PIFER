@@ -1,0 +1,8 @@
+.vscode/
+.idea/
+*.out
+*.log
+*/__pycache__/
+tmp.*
+*.S
+*.patched.bin
