@@ -84,3 +84,28 @@ print(f"Done")
 
 </p>
 </details>
+
+## How it works
+
+![](./figures/hook-sys.png)
+
+Speaking in a way that ignores the details:
+
+1. Each instruction at the hooking address will be replaced with one that can raise an exception, and the corresponding handler will be replaced in the vector table with the newly added code.
+2. In the handler we distinguish from which address the exception came from and jump to the corresponding code execution.
+3. We find a way to correctly *replay* the execution of the patched instruction from a different location in the handler code, ensuring that the original program executes flawlessly. Refer to the paper for details.
+4. Save the context and execute the inserted code.
+5. Restore the context and return to original control flow. 
+
+### Example
+
+An example of the generated assembly by PIFER, targeting a Zephyr RTOS binary on Cortex-M4 is shown in the following figure:
+
+![](./figures/example-arm.png)
+
+
+In the example, the patch target is a PC relative addressing instruction `LDR` `R2`, [`PC`, `0x2C`], which is replaced with a `UDF` `0xAB`. When the program executes to `0x3EE`, the processor will transfer the control flow to the `.handler` (modified in the exception vector table).  
+
+The bottom left shows the context saved by the processor. The hooking system manipulates its contents to control the context when returning from the exception mode, e.g. the return position (`PC`). The assembly code generated for this target is shown on the right side, where `0x20001D70` is the location of storage space located at the bottom of the stack memory. For simplicity we only demonstrate the single hooking case and remove the dispatcher. 
+
+For instrumentation, you can add any instrument code between the step `C` and `D`.
