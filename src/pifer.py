@@ -48,7 +48,9 @@ class PIFER:
     def get_binary_params(self, vtable_img_offset=0x0, skip_reset_header=0):
         with open(self.bin_path, "rb") as f:
             f.seek(vtable_img_offset, 0)
-            stack_base = int.from_bytes(f.read(4), "little")
+            # stack_base = int.from_bytes(f.read(4), "little")
+            # TODO: dynamically determined free space location
+            stack_base = 0x20000000
             f.seek(vtable_img_offset + 0x4, 0)
             reset_handler_ori = int.from_bytes(f.read(4), "little")
             f.seek(vtable_img_offset + 0xC, 0)
