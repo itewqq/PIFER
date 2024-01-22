@@ -185,11 +185,12 @@ class TRANS:
         label_orig = label_orig.strip()
         assert(label_orig.startswith("#")) # only label allowed here
         code = "\n\t" + inst.mnemonic + " " + Rn + f", label_cb_out{hex(addr)}\n"
-        code+= f"\tMOV {free_reg}, #{hex(addr+inst_len+1)}\n"
+        code+= f"\tLDR {free_reg}, =#{hex(addr+inst_len+1)}\n"
         code+= f"\tUDF #{hex(INST_TYPE['ins_pc_out'])}0\n"
         code+= f"label_cb_out{hex(addr)}:\n"
-        code+= f"\tMOV {free_reg}, {label_orig}\n"
+        code+= f"\tLDR {free_reg}, ={label_orig}\n"
         code+= f"\tUDF #{hex(INST_TYPE['ins_pc_out'])}0\n"
+        code+= f"\t.LTORG\n"
         # reuse the pc relative code
         self.translate_pc(inst, code)
 
