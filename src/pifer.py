@@ -9,15 +9,16 @@ from translator import TRANS
 
 class PIFER:
     __slots__ = "bin_path", "img_base", "arch", "compile_options", \
-        "patched_path", "params_asm", "asm_template", "params_asm", "payload", "addr_target"
+        "patched_path", "params_asm", "asm_template", "params_asm", "payload", "addr_target", "stack_free_base"
 
-    def __init__(self, bin_path: str, img_base: int, arch: str, compile_options="", vtable_offset=0):
+    def __init__(self, bin_path: str, img_base: int, arch: str, compile_options="", stack_free_base=0x20000000, vtable_offset=0):
         assert bin_path[-4:] == ".bin"
         self.patched_path = bin_path[:-4] + ".patched.bin"
         self.bin_path = bin_path
         self.img_base = img_base
         self.arch = arch
         self.compile_options = compile_options
+        self.stack_free_base = stack_free_base
         if arch == "cortex-m0":
             self.asm_template = template_string_M0
         else:
@@ -48,9 +49,7 @@ class PIFER:
     def get_binary_params(self, vtable_img_offset=0x0, skip_reset_header=0):
         with open(self.bin_path, "rb") as f:
             f.seek(vtable_img_offset, 0)
-            # stack_base = int.from_bytes(f.read(4), "little")
-            # TODO: dynamically determined free space location
-            stack_base = 0x20000000
+            stack_base = self.stack_free_base
             f.seek(vtable_img_offset + 0x4, 0)
             reset_handler_ori = int.from_bytes(f.read(4), "little")
             f.seek(vtable_img_offset + 0xC, 0)
@@ -132,7 +131,7 @@ class PIFER:
         self.params_asm = self.get_binary_params()
         
         target_pc_list = [x for x in self.addr_target]
-        self.get_target_params(target_pc_list)
+        self.get_target_params(target_pc_list, img_base=img_base)
         self.set_newcode()
         # compile the assembly modules
         _, new_seg_offset = self.get_new_seg_offset()

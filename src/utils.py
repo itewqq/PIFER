@@ -104,10 +104,10 @@ def patch_bytes_img(file_path: str, img_offset: int, target_bytes: bytes):
         with open(file_path, "r+b") as f:
             f.seek(img_offset)
             f.write(target_bytes)
-        print(f"\t[+] patched {hex(img_offset)}")
+        print(f"\t[+] patched file offset {hex(img_offset)}")
     except Exception as e:
         print(e)
-        print(f"\t[x] patched {hex(img_offset)} error!")
+        print(f"\t[x] patching file offset {hex(img_offset)} error!")
 
 def get_new_bytes_offsets(elf_path="a.out"):
     result = b""
