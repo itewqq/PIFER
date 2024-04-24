@@ -2,6 +2,8 @@
 
 ## Intro
 
+>This is the code repo for the paper `Trapped by Your WORDs: (Ab)using Processor Exceptions for Binary Instrumentation on Bare-metal Embedded Firmware, 61st ACM/IEEE Design Automation Conference (DAC '24), June 23--27, 2024, San Francisco, CA, USA`.
+
 A fine-grained static binary instrumenting framework for bare-metal ARM firmware.
 
 ## Install
